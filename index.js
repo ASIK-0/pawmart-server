@@ -22,9 +22,30 @@ const client = new MongoClient(uri, {
 
 async function run() {
     try {
-        // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
-        // Send a ping to confirm a successful connection
+
+        // database
+        const db = client.db('pawmart-db')
+        const productCollection = db.collection('products')
+
+        app.get('/products', async (req, res) => {
+            const result = await productCollection.find().toArray()
+            res.send(result)
+        })
+
+        // post method
+        app.post('/products', async (req, res) => {
+            const data = await productCollection.insertOne(req.body)
+            console.log(req.body)
+
+            res.send({
+                success: true
+            })
+        })
+
+
+
+
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
@@ -32,13 +53,6 @@ async function run() {
     }
 }
 run().catch(console.dir);
-
-
-
-
-app.get('/', (req, res) => {
-    res.send('PawMart server is running')
-})
 
 app.listen(port, () => {
     console.log(`Pawmart server is running on port: ${port}`)
