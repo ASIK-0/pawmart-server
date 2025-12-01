@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -28,9 +28,22 @@ async function run() {
         const db = client.db('pawmart-db')
         const productCollection = db.collection('products')
 
+        // find
         app.get('/products', async (req, res) => {
             const result = await productCollection.find().toArray()
             res.send(result)
+        })
+        // findOne
+        app.get('/products/:id', async (req, res) => {
+            const { id } = req.params
+            const objectId = new ObjectId(id)
+
+            const result = await productCollection.findOne({ _id: objectId })
+
+            res.send({
+                success: true,
+                result
+            })
         })
 
         // post method
@@ -39,9 +52,17 @@ async function run() {
             console.log(req.body)
 
             res.send({
-                success: true
+                success: true,
+                data
             })
         })
+
+        // category filtered product find
+        app.get('/category-products/:category', async (req, res) => {
+            const category = req.params.category;
+            const result = await productCollection.find({ category }).toArray();
+            res.send(result);
+        });
 
 
 
