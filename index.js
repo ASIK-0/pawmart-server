@@ -65,6 +65,13 @@ async function run() {
         });
 
 
+        // latest 6 data find (get)
+        app.get('/latest-products', async (req, res) => {
+            const result = await productCollection.find().sort({ date: -1 }).limit(6).toArray()
+
+            res.send(result)
+        });
+
 
 
         await client.db("admin").command({ ping: 1 });
