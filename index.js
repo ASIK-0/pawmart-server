@@ -37,9 +37,7 @@ async function run() {
         app.get('/products/:id', async (req, res) => {
             const { id } = req.params
             const objectId = new ObjectId(id)
-
             const result = await productCollection.findOne({ _id: objectId })
-
             res.send({
                 success: true,
                 result
@@ -50,7 +48,6 @@ async function run() {
         app.post('/products', async (req, res) => {
             const data = await productCollection.insertOne(req.body)
             console.log(req.body)
-
             res.send({
                 success: true,
                 data
@@ -68,19 +65,29 @@ async function run() {
         // latest 6 data find (get)
         app.get('/latest-products', async (req, res) => {
             const result = await productCollection.find().sort({ date: -1 }).limit(6).toArray()
-
             res.send(result)
         });
 
         // MyListing data get
-        app.get('/my-listings',async (req, res) => {
-
+        app.get('/my-listings', async (req, res) => {
             const { email } = req.query
             const query = { email: email }
             const result = await productCollection.find(query).toArray()
             res.send(result)
         })
 
+        // update Listing (put method)
+        app.put('/update/:id', async (req, res) => {
+            const data = req.body;
+            const id = req.params
+            const query = {_id: new ObjectId(id)}
+
+            const updateListings = {
+                $set: data
+            }
+            const result = await productCollection.updateOne(query, updateListings)
+            res.send(result)
+        })
 
 
 
