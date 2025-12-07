@@ -27,6 +27,7 @@ async function run() {
         // database
         const db = client.db('pawmart-db')
         const productCollection = db.collection('products')
+        const orderCollections = db.collection('orders')
 
         // find
         app.get('/products', async (req, res) => {
@@ -80,7 +81,7 @@ async function run() {
         app.put('/update/:id', async (req, res) => {
             const data = req.body;
             const id = req.params
-            const query = {_id: new ObjectId(id)}
+            const query = { _id: new ObjectId(id) }
 
             const updateListings = {
                 $set: data
@@ -90,13 +91,22 @@ async function run() {
         })
 
         // delete listing
-        app.delete('/delete/:id', async(req, res) => {
+        app.delete('/delete/:id', async (req, res) => {
             const id = req.params
-            const query = {_id: new ObjectId(id)}
+            const query = { _id: new ObjectId(id) }
             const result = await productCollection.deleteOne(query)
             res.send(result)
         })
 
+        // oders 
+        app.post('/orders', async (req, res) => {
+            const data = req.body
+            console.log(data)
+            const result = await orderCollections.insertOne(data)
+            res.send(result)
+        })
+
+        
 
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
